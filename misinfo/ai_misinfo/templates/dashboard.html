@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📊 Misinformation Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background: #f9f9f9; }
+    .card { border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .fake { color: red; font-weight: bold; }
+    .real { color: green; font-weight: bold; }
+    .uncertain { color: orange; font-weight: bold; }
+    .small-text { font-size: 0.9em; color: #666; }
+  </style>
+</head>
+<body class="container py-4">
+
+  <h2 class="text-center mb-4">📊 Dashboard: Past Analyses</h2>
+
+  <!-- Filter Dropdown -->
+  <div class="d-flex justify-content-between mb-3">
+    <div>
+      <a href="/" class="btn btn-outline-secondary">⬅ Back to Analyzer</a>
+    </div>
+    <div>
+      <form method="get" class="d-flex">
+        <select name="verdict" class="form-select me-2" onchange="this.form.submit()">
+          <option value="">All</option>
+          <option value="Real" {% if verdict_filter == "Real" %}selected{% endif %}>Real</option>
+          <option value="Fake" {% if verdict_filter == "Fake" %}selected{% endif %}>Fake</option>
+          <option value="Uncertain" {% if verdict_filter == "Uncertain" %}selected{% endif %}>Uncertain</option>
+        </select>
+        <noscript><button class="btn btn-primary">Filter</button></noscript>
+      </form>
+    </div>
+  </div>
+
+  <!-- List of Analyses -->
+  {% if analyses %}
+    <div class="row">
+      {% for a in analyses %}
+        <div class="col-md-6 mb-4">
+          <div class="card p-3">
+            <h5>Verdict: 
+              <span class="{% if a.status_text == 'Real' %}real{% elif a.status_text == 'Fake' %}fake{% else %}uncertain{% endif %}">
+                {{ a.status_text }}
+              </span>
+            </h5>
+            <p><strong>Confidence:</strong> {{ a.confidence|default:"-"|floatformat:0 }}%</p>
+            <p><strong>Summary:</strong> {{ a.brief_summary }}</p>
+            
+            <p><strong>Education Tips:</strong></p>
+            <ul>
+              {% for tip in a.education %}
+                <li>{{ tip }}</li>
+              {% endfor %}
+            </ul>
+
+            {% if a.factcheck_links %}
+              <p><strong>Fact-check Sources:</strong></p>
+              <ul>
+                {% for link in a.factcheck_links %}
+                  <li><a href="{{ link }}" target="_blank">{{ link }}</a></li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+
+            <p class="small-text">🕒 {{ a.created_at|default:"" }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">No analyses found yet.</div>
+  {% endif %}
+
+</body>
+</html>
