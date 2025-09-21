@@ -1,1 +1,5 @@
+Django>=4.2
+gunicorn
+whitenoise
+dj-database-url
 langdetect==1.0.9
